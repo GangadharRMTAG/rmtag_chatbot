@@ -80,7 +80,6 @@ app.UseRouting();
 
 app.UseCors("AllowAll");
 app.UseWebSockets(); 
-
 app.UseAuthorization();
 app.MapControllers();
 app.MapFallbackToFile("index.html"); 
