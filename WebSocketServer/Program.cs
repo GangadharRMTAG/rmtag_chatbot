@@ -12,6 +12,7 @@ using System.Text;
 using WebSocketServer.Models;
 using WebSocketServer.Data;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
 
 using Microsoft.AspNetCore.Builder;
 
@@ -30,12 +31,24 @@ builder.Services.AddCors(options =>
 builder.Services.AddHttpClient();
 builder.Services.AddSingleton<WebSocketHandler>(); 
 
-// var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-//                        ?? builder.Configuration["DATABASE_URL"];
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") 
     ?? builder.Configuration["DATABASE_URL"];
 
+    var loggerFactory = LoggerFactory.Create(logging =>
+{
+    logging.AddConsole();
+});
+var logger = loggerFactory.CreateLogger<Program>();
+logger.LogInformation("Connection String: {ConnectionString}", connectionString);
+
+
+
+if (string.IsNullOrEmpty(connectionString))
+{
+    logger.LogError("Connection string is null or empty. Make sure the DATABASE_URL environment variable is set.");
+    throw new ArgumentNullException("connectionString", "The connection string cannot be null or empty.");
+}
 
 builder.Services.AddDbContext<DataContext>(options =>
     options.UseNpgsql(connectionString));
@@ -49,10 +62,11 @@ using (var scope = app.Services.CreateScope())
     {
         var context = services.GetRequiredService<DataContext>();
         context.Database.Migrate();
+        logger.LogInformation("Database migration completed successfully.");
     }
     catch (Exception ex)
     {
-        var logger = services.GetRequiredService<ILogger<Program>>();
+        //var logger = services.GetRequiredService<ILogger<Program>>();
         logger.LogError(ex, "An error occurred while migrating the database.");
     }
 }
