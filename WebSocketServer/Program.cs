@@ -75,10 +75,15 @@ using (var scope = app.Services.CreateScope())
     }
 }
 
-app.UseWebSockets(); 
+app.UseStaticFiles();
+app.UseRouting();
+
 app.UseCors("AllowAll");
+app.UseWebSockets(); 
+
 app.UseAuthorization();
 app.MapControllers();
+app.MapFallbackToFile("index.html"); 
 app.MapWebSocketManager("/ws", app.Services.GetService<WebSocketHandler>()); 
 app.Run(url: "http://*:8080");
 
