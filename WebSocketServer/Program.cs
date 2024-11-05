@@ -33,19 +33,18 @@ builder.Services.AddCors(options =>
             .AllowAnyMethod());
 });
 builder.Services.AddHttpClient();
-builder.Services.AddSingleton<WebSocketHandler>(); 
+builder.Services.AddSingleton<WebSocketHandler>();
 
 
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") 
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
     ?? builder.Configuration["DATABASE_URL"];
 
-    var loggerFactory = LoggerFactory.Create(logging =>
+var loggerFactory = LoggerFactory.Create(logging =>
 {
-    logging.AddConsole();
+logging.AddConsole();
 });
 var logger = loggerFactory.CreateLogger<Program>();
 logger.LogInformation("Connection String: {ConnectionString}", connectionString);
-
 
 
 if (string.IsNullOrEmpty(connectionString))
@@ -77,7 +76,6 @@ using (var scope = app.Services.CreateScope())
 
 app.UseStaticFiles();
 app.UseRouting();
-
 app.UseCors("AllowAll");
 app.UseWebSockets(); 
 app.UseAuthorization();
