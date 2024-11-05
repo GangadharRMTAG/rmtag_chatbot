@@ -36,22 +36,28 @@ builder.Services.AddHttpClient();
 builder.Services.AddSingleton<WebSocketHandler>();
 
 
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
-    ?? builder.Configuration["DATABASE_URL"];
+// var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
+//     ?? builder.Configuration["DATABASE_URL"];
 
 var loggerFactory = LoggerFactory.Create(logging =>
 {
 logging.AddConsole();
 });
+
+var connectionString = $"Host={builder.Configuration["PGHOST"]};" +
+                       $"Port={builder.Configuration["PGPORT"]};" +
+                       $"Username={builder.Configuration["PGUSER"]};" +
+                       $"Password={builder.Configuration["PGPASSWORD"]};" +
+                       $"Database={builder.Configuration["PGDATABASE"]};";
 var logger = loggerFactory.CreateLogger<Program>();
 logger.LogInformation("Connection String: {ConnectionString}", connectionString);
 
 
-if (string.IsNullOrEmpty(connectionString))
-{
-    logger.LogError("Connection string is null or empty. Make sure the DATABASE_URL environment variable is set.");
-    throw new ArgumentNullException("connectionString", "The connection string cannot be null or empty.");
-}
+// if (string.IsNullOrEmpty(connectionString))
+// {
+//     logger.LogError("Connection string is null or empty. Make sure the DATABASE_URL environment variable is set.");
+//     throw new ArgumentNullException("connectionString", "The connection string cannot be null or empty.");
+// }
 
 builder.Services.AddDbContext<DataContext>(options =>
     options.UseNpgsql(connectionString));
