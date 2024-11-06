@@ -14,11 +14,6 @@ using WebSocketServer.Data;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 
-using Microsoft.AspNetCore.Builder;
-
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -43,7 +38,16 @@ if (builder.Environment.IsDevelopment())
 }
 else
 {
+    var loggerFactory = LoggerFactory.Create(logging => logging.AddConsole());
+    var logger = loggerFactory.CreateLogger<Program>();
+
     var databaseUrl = builder.Configuration["DATABASE_URL"];
+
+    if (string.IsNullOrEmpty(databaseUrl))
+    {
+        logger.LogWarning("DATABASE_URL not found in configuration, trying Environment.GetEnvironmentVariable...");
+        databaseUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
+    }
 
     if (!string.IsNullOrEmpty(databaseUrl))
     {
@@ -51,29 +55,22 @@ else
         {
             var uri = new Uri(databaseUrl);
             var username = uri.UserInfo.Split(':')[0];
-            var password = uri.UserInfo.Split(':')[1];  
+            var password = uri.UserInfo.Split(':')[1];
             var host = uri.Host;
             var port = uri.Port;
-            var dbname = uri.AbsolutePath.TrimStart('/');  
+            var dbname = uri.AbsolutePath.TrimStart('/');
 
             connectionString = $"Host={host};Port={port};Username={username};Password={password};Database={dbname};";
-
-            var loggerFactory = LoggerFactory.Create(logging => logging.AddConsole());
-            var logger = loggerFactory.CreateLogger<Program>();
-            logger.LogInformation("Using the connection string: {ConnectionString}", connectionString);
+            logger.LogInformation("Using constructed connection string for production.");
         }
         catch (Exception ex)
         {
-            var loggerFactory = LoggerFactory.Create(logging => logging.AddConsole());
-            var logger = loggerFactory.CreateLogger<Program>();
             logger.LogError(ex, "Error parsing DATABASE_URL environment variable.");
             throw new Exception("Error parsing DATABASE_URL environment variable.", ex);
         }
     }
     else
     {
-        var loggerFactory = LoggerFactory.Create(logging => logging.AddConsole());
-        var logger = loggerFactory.CreateLogger<Program>();
         logger.LogError("DATABASE_URL environment variable is missing.");
         throw new Exception("DATABASE_URL environment variable is missing.");
     }
@@ -121,6 +118,7 @@ app.MapFallbackToFile("index.html");
 app.MapWebSocketManager("/ws", app.Services.GetService<WebSocketHandler>());
 
 app.Run(url: "http://*:8080");
+
 
 
 
