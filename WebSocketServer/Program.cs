@@ -38,16 +38,7 @@ if (builder.Environment.IsDevelopment())
 }
 else
 {
-    var loggerFactory = LoggerFactory.Create(logging => logging.AddConsole());
-    var logger = loggerFactory.CreateLogger<Program>();
-
-    var databaseUrl = builder.Configuration["DATABASE_URL"];
-
-    if (string.IsNullOrEmpty(databaseUrl))
-    {
-        logger.LogWarning("DATABASE_URL not found in configuration, trying Environment.GetEnvironmentVariable...");
-        databaseUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
-    }
+    var databaseUrl = builder.Configuration["DATABASE_URL"] ?? Environment.GetEnvironmentVariable("DATABASE_URL");
 
     if (!string.IsNullOrEmpty(databaseUrl))
     {
@@ -61,20 +52,28 @@ else
             var dbname = uri.AbsolutePath.TrimStart('/');
 
             connectionString = $"Host={host};Port={port};Username={username};Password={password};Database={dbname};";
-            logger.LogInformation("Using constructed connection string for production.");
+
+            var loggerFactory = LoggerFactory.Create(logging => logging.AddConsole());
+            var logger = loggerFactory.CreateLogger<Program>();
+            logger.LogInformation("Using the connection string: {ConnectionString}", connectionString);
         }
         catch (Exception ex)
         {
+            var loggerFactory = LoggerFactory.Create(logging => logging.AddConsole());
+            var logger = loggerFactory.CreateLogger<Program>();
             logger.LogError(ex, "Error parsing DATABASE_URL environment variable.");
             throw new Exception("Error parsing DATABASE_URL environment variable.", ex);
         }
     }
     else
     {
+        var loggerFactory = LoggerFactory.Create(logging => logging.AddConsole());
+        var logger = loggerFactory.CreateLogger<Program>();
         logger.LogError("DATABASE_URL environment variable is missing.");
         throw new Exception("DATABASE_URL environment variable is missing.");
     }
 }
+
 
 if (string.IsNullOrEmpty(connectionString))
 {
