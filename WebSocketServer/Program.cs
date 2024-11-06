@@ -38,7 +38,13 @@ if (builder.Environment.IsDevelopment())
 }
 else
 {
-    var databaseUrl = builder.Configuration["DATABASE_URL"] ?? Environment.GetEnvironmentVariable("DATABASE_URL");
+    var loggerFactory = LoggerFactory.Create(logging => logging.AddConsole());
+var logger = loggerFactory.CreateLogger<Program>();
+logger.LogInformation("Current Environment: {Environment}", builder.Environment.EnvironmentName);
+
+// Check if DATABASE_URL is accessible through Configuration or directly via Environment
+var databaseUrl = builder.Configuration["DATABASE_URL"] ?? Environment.GetEnvironmentVariable("DATABASE_URL");
+logger.LogInformation("Retrieved DATABASE_URL: {DatabaseUrl}", databaseUrl);
 
     if (!string.IsNullOrEmpty(databaseUrl))
     {
@@ -53,22 +59,22 @@ else
 
             connectionString = $"Host={host};Port={port};Username={username};Password={password};Database={dbname};";
 
-            var loggerFactory = LoggerFactory.Create(logging => logging.AddConsole());
-            var logger = loggerFactory.CreateLogger<Program>();
+            // var loggerFactory = LoggerFactory.Create(logging => logging.AddConsole());
+            // var logger = loggerFactory.CreateLogger<Program>();
             logger.LogInformation("Using the connection string: {ConnectionString}", connectionString);
         }
         catch (Exception ex)
         {
-            var loggerFactory = LoggerFactory.Create(logging => logging.AddConsole());
-            var logger = loggerFactory.CreateLogger<Program>();
+            // var loggerFactory = LoggerFactory.Create(logging => logging.AddConsole());
+            // var logger = loggerFactory.CreateLogger<Program>();
             logger.LogError(ex, "Error parsing DATABASE_URL environment variable.");
             throw new Exception("Error parsing DATABASE_URL environment variable.", ex);
         }
     }
     else
     {
-        var loggerFactory = LoggerFactory.Create(logging => logging.AddConsole());
-        var logger = loggerFactory.CreateLogger<Program>();
+        // var loggerFactory = LoggerFactory.Create(logging => logging.AddConsole());
+        // var logger = loggerFactory.CreateLogger<Program>();
         logger.LogError("DATABASE_URL environment variable is missing.");
         throw new Exception("DATABASE_URL environment variable is missing.");
     }
