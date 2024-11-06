@@ -16,7 +16,12 @@ using Microsoft.Extensions.Logging;
 
 using Microsoft.AspNetCore.Builder;
 
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.DependencyInjection;
+
 var builder = WebApplication.CreateBuilder(args);
+
 builder.Logging.ClearProviders();
 builder.Logging.AddConsole();
 builder.Logging.SetMinimumLevel(LogLevel.Information);
@@ -38,15 +43,46 @@ if (builder.Environment.IsDevelopment())
 }
 else
 {
-    connectionString = builder.Configuration["DATABASE_URL"];
-}
+    var databaseUrl = builder.Configuration["DATABASE_URL"];
 
-var loggerFactory = LoggerFactory.Create(logging => logging.AddConsole());
-var logger = loggerFactory.CreateLogger<Program>();
-logger.LogInformation("Connection String: {ConnectionString}", connectionString);
+    if (!string.IsNullOrEmpty(databaseUrl))
+    {
+        try
+        {
+            var uri = new Uri(databaseUrl);
+            var username = uri.UserInfo.Split(':')[0];
+            var password = uri.UserInfo.Split(':')[1];  
+            var host = uri.Host;
+            var port = uri.Port;
+            var dbname = uri.AbsolutePath.TrimStart('/');  
+
+            connectionString = $"Host={host};Port={port};Username={username};Password={password};Database={dbname};";
+
+            var loggerFactory = LoggerFactory.Create(logging => logging.AddConsole());
+            var logger = loggerFactory.CreateLogger<Program>();
+            logger.LogInformation("Using the connection string: {ConnectionString}", connectionString);
+        }
+        catch (Exception ex)
+        {
+            var loggerFactory = LoggerFactory.Create(logging => logging.AddConsole());
+            var logger = loggerFactory.CreateLogger<Program>();
+            logger.LogError(ex, "Error parsing DATABASE_URL environment variable.");
+            throw new Exception("Error parsing DATABASE_URL environment variable.", ex);
+        }
+    }
+    else
+    {
+        var loggerFactory = LoggerFactory.Create(logging => logging.AddConsole());
+        var logger = loggerFactory.CreateLogger<Program>();
+        logger.LogError("DATABASE_URL environment variable is missing.");
+        throw new Exception("DATABASE_URL environment variable is missing.");
+    }
+}
 
 if (string.IsNullOrEmpty(connectionString))
 {
+    var loggerFactory = LoggerFactory.Create(logging => logging.AddConsole());
+    var logger = loggerFactory.CreateLogger<Program>();
     logger.LogError("Database connection string is not set. Please check your configuration.");
     throw new Exception("Database connection string is not set.");
 }
@@ -62,11 +98,15 @@ using (var scope = app.Services.CreateScope())
     try
     {
         var context = services.GetRequiredService<DataContext>();
-        context.Database.Migrate(); 
+        context.Database.Migrate();
+        var loggerFactory = LoggerFactory.Create(logging => logging.AddConsole());
+        var logger = loggerFactory.CreateLogger<Program>();
         logger.LogInformation("Database migration completed successfully.");
     }
     catch (Exception ex)
     {
+        var loggerFactory = LoggerFactory.Create(logging => logging.AddConsole());
+        var logger = loggerFactory.CreateLogger<Program>();
         logger.LogError(ex, "An error occurred while migrating the database.");
     }
 }
