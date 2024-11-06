@@ -17,7 +17,6 @@ using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Builder;
 
 var builder = WebApplication.CreateBuilder(args);
-
 builder.Logging.ClearProviders();
 builder.Logging.AddConsole();
 builder.Logging.SetMinimumLevel(LogLevel.Information);
@@ -26,38 +25,31 @@ builder.Services.AddHttpContextAccessor();
 builder.Services.AddControllers();
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowAll",
-        builder => builder
-            .AllowAnyOrigin()
-            .AllowAnyHeader()
-            .AllowAnyMethod());
+    options.AddPolicy("AllowAll", builder => builder.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod());
 });
 builder.Services.AddHttpClient();
 builder.Services.AddSingleton<WebSocketHandler>();
 
+string connectionString = null;
 
-// var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
-//     ?? builder.Configuration["DATABASE_URL"];
-
-var loggerFactory = LoggerFactory.Create(logging =>
+if (builder.Environment.IsDevelopment())
 {
-logging.AddConsole();
-});
+    connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+}
+else
+{
+    connectionString = builder.Configuration["DATABASE_URL"];
+}
 
-var connectionString = $"Host={builder.Configuration["PGHOST"]};" +
-                       $"Port={builder.Configuration["PGPORT"]};" +
-                       $"Username={builder.Configuration["PGUSER"]};" +
-                       $"Password={builder.Configuration["PGPASSWORD"]};" +
-                       $"Database={builder.Configuration["PGDATABASE"]};";
+var loggerFactory = LoggerFactory.Create(logging => logging.AddConsole());
 var logger = loggerFactory.CreateLogger<Program>();
 logger.LogInformation("Connection String: {ConnectionString}", connectionString);
 
-
-// if (string.IsNullOrEmpty(connectionString))
-// {
-//     logger.LogError("Connection string is null or empty. Make sure the DATABASE_URL environment variable is set.");
-//     throw new ArgumentNullException("connectionString", "The connection string cannot be null or empty.");
-// }
+if (string.IsNullOrEmpty(connectionString))
+{
+    logger.LogError("Database connection string is not set. Please check your configuration.");
+    throw new Exception("Database connection string is not set.");
+}
 
 builder.Services.AddDbContext<DataContext>(options =>
     options.UseNpgsql(connectionString));
@@ -70,25 +62,27 @@ using (var scope = app.Services.CreateScope())
     try
     {
         var context = services.GetRequiredService<DataContext>();
-        context.Database.Migrate();
+        context.Database.Migrate(); 
         logger.LogInformation("Database migration completed successfully.");
     }
     catch (Exception ex)
     {
-        //var logger = services.GetRequiredService<ILogger<Program>>();
         logger.LogError(ex, "An error occurred while migrating the database.");
     }
 }
 
+app.UseCors("AllowAll");
 app.UseStaticFiles();
 app.UseRouting();
-app.UseCors("AllowAll");
-app.UseWebSockets(); 
+app.UseWebSockets();
 app.UseAuthorization();
 app.MapControllers();
-app.MapFallbackToFile("index.html"); 
-app.MapWebSocketManager("/ws", app.Services.GetService<WebSocketHandler>()); 
+app.MapFallbackToFile("index.html");
+app.MapWebSocketManager("/ws", app.Services.GetService<WebSocketHandler>());
+
 app.Run(url: "http://*:8080");
+
+
 
 public class WebSocketHandler
 {
