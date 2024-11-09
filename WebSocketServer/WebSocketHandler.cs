@@ -44,7 +44,9 @@ public class WebSocketHandler
 
                 await SaveMessageToDatabase(user.Username, user.roomname, msg);
 
-                await SendMessageToRoom(user.roomname, msg);
+                // await SendMessageToRoom(user.roomname, msg);
+                await SendMessageToRoom(user.roomname, message, user.Username);
+
 
             }
         }
@@ -76,6 +78,7 @@ public class WebSocketHandler
         await _dbContext.SaveChangesAsync();
     }
 
+
     private async Task SendMessageHistory(string roomName, User user)
     {
         var messages = await _dbContext.Messages
@@ -94,7 +97,8 @@ public class WebSocketHandler
         }
     }
 
-    private async Task SendMessageToRoom(string roomName, string message)
+
+    private async Task SendMessageToRoom(string roomName, string message, string username)
     {
         if (_roomUsers.ContainsKey(roomName))
         {
@@ -102,14 +106,17 @@ public class WebSocketHandler
             {
                 if (_sockets.TryGetValue(user.Username, out var socket) && socket.State == WebSocketState.Open)
                 {
-                    var bytes = System.Text.Encoding.UTF8.GetBytes(message);
+                    string formattedMessage = $"{username}: {message}";
+
+                    var bytes = System.Text.Encoding.UTF8.GetBytes(formattedMessage);
                     await socket.SendAsync(new ArraySegment<byte>(bytes), WebSocketMessageType.Text, true, CancellationToken.None);
                 }
             }
         }
     }
 
-    private void AddSocketToRoom(string roomName, User user, WebSocket socket)
+
+    private async Task AddSocketToRoom(string roomName, User user, WebSocket socket)
     {
         lock (_roomUsers)
         {
@@ -126,6 +133,20 @@ public class WebSocketHandler
                     _sockets[user.Username] = socket;
                 }
 
+                var existingUser = _dbContext.Users
+                    .FirstOrDefault(u => u.Username == user.Username && u.roomname == roomName);
+
+                if (existingUser == null)
+                {
+                    var dbUser = new User
+                    {
+                        Username = user.Username,
+                        roomname = roomName,
+
+                    };
+                    _dbContext.Users.Add(dbUser);
+                    _dbContext.SaveChangesAsync();
+                }
                 NotifyUsersInRoom(roomName);
             }
         }
@@ -149,41 +170,25 @@ public class WebSocketHandler
         }
     }
 
+
     private async void NotifyUsersInRoom(string roomName)
     {
         if (_roomUsers.ContainsKey(roomName))
         {
             var connectedUsers = _roomUsers[roomName].Select(u => u.Username).ToList();
-            Console.WriteLine($"Connected users in {roomName}: {string.Join(", ", connectedUsers)}");
-            var userListMessage = $"Connected users in {roomName}: {string.Join(", ", connectedUsers)}";
-
-            await SendMessageToRoom(roomName, userListMessage);
+            Console.WriteLine($"!!!!!Connected users in {roomName}: {string.Join(", ", connectedUsers)}");
+            var userListMessage = $"users:{string.Join(",", connectedUsers)}";
+            foreach (var user in _roomUsers[roomName])
+            {
+                if (_sockets.TryGetValue(user.Username, out var socket) && socket.State == WebSocketState.Open)
+                {
+                    var bytes = System.Text.Encoding.UTF8.GetBytes(userListMessage);
+                    await socket.SendAsync(new ArraySegment<byte>(bytes), WebSocketMessageType.Text, true, CancellationToken.None);
+                    Console.WriteLine($"!!!!!Sent to {user.Username}: {userListMessage}");
+                }
+            }
         }
     }
 }
 
-public static class WebSocketExtensions
-{
-    public static void MapWebSocketManager(this IEndpointRouteBuilder endpoints, string path, WebSocketHandler handler)
-    {
-        endpoints.MapGet(path, async context =>
-        {
-            if (context.WebSockets.IsWebSocketRequest)
-            {
-                WebSocket webSocket = await context.WebSockets.AcceptWebSocketAsync();
-
-                var username = context.Request.Query["username"];
-                var roomname = context.Request.Query["roomname"];
-
-                var user = new User { Username = username, roomname = roomname };
-
-                await handler.Handle(webSocket, user);
-            }
-            else
-            {
-                context.Response.StatusCode = 400;
-            }
-        });
-    }
-}
 

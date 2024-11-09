@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
 using WebSocketServer.Data;
 using WebSocketServer.Models;
@@ -31,6 +32,3 @@ public class UserController : ControllerBase
         return Ok(user);
     }
 }
-
-
-
