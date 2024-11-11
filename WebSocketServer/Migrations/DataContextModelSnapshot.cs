@@ -88,9 +88,6 @@ namespace WebSocketServer.Migrations
                     b.Property<DateTime>("ConnectionTime")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("boolean");
-
                     b.Property<string>("Username")
                         .HasColumnType("text");
 

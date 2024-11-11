@@ -12,7 +12,7 @@ using WebSocketServer.Data;
 namespace WebSocketServer.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20241111062843_InitialCreate")]
+    [Migration("20241111080818_InitialCreate")]
     partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -89,9 +89,6 @@ namespace WebSocketServer.Migrations
 
                     b.Property<DateTime>("ConnectionTime")
                         .HasColumnType("timestamp with time zone");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("boolean");
 
                     b.Property<string>("Username")
                         .HasColumnType("text");

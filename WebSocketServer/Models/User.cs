@@ -6,7 +6,7 @@ namespace WebSocketServer.Models
         public string? Username { get; set; }
         public string? roomname { get; set; }
         public DateTime ConnectionTime { get; set; } = DateTime.UtcNow;
-         public bool IsActive { get; set; }
+       //  public bool IsActive { get; set; }
         // public string? Email { get; set; }
         // public string? Password { get; set; }   
     }

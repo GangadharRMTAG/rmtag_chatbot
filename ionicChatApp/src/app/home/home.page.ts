@@ -20,7 +20,8 @@ export class HomePage implements OnInit {
 
   constructor(private route: Router, private http: HttpClient) { }
 
-  ngOnInit(): void {
+  ngOnInit(): void 
+  {
     this.joinRoomForm = this.fb.group({
       user: ['', Validators.required],
       room: ['', Validators.required]
