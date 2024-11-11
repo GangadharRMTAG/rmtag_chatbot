@@ -74,7 +74,7 @@ public class UserController : ControllerBase
         {
             Username = Username,
             roomname = roomname,
-            ConnectionTime = DateTime.UtcNow
+            ConnectionTime = DateTime.Now
         };
 
         _context.Users.Add(user);
