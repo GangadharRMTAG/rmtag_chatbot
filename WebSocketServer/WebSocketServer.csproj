@@ -22,4 +22,13 @@
     <Folder Include="Controllers\" />
   </ItemGroup>
 
+  <!-- <ItemGroup>
+    <Content Include="wwwroot\**" CopyToPublishDirectory="PreserveNewest" />
+  </ItemGroup> -->
+
+   <PropertyGroup>
+    <EnableDefaultContentItems>false</EnableDefaultContentItems>
+  </PropertyGroup>
+
+
 </Project>

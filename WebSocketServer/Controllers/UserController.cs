@@ -50,4 +50,38 @@ public class UserController : ControllerBase
 
         return Ok(new { message = "User added successfully", navigate = true });
     }
+
+
+    [HttpGet("connect")]
+    public async Task<IActionResult> JoinRoom([FromQuery] string Username,[FromQuery] string roomname)
+    {
+        Console.WriteLine($"POST: Received join request: Username: {Username}, Room: {roomname}");
+
+        if (string.IsNullOrEmpty(Username) || string.IsNullOrEmpty(roomname))
+        {
+            return BadRequest("Invalid user data.");
+        }
+
+        var existingUser = await _context.Users
+            .FirstOrDefaultAsync(u => u.Username == Username && u.roomname == roomname);
+
+        if (existingUser != null)
+        {
+            return Ok(new { message = "User already in the room", navigate = true });
+        }
+
+        var user = new User
+        {
+            Username = Username,
+            roomname = roomname,
+            ConnectionTime = DateTime.UtcNow
+        };
+
+        _context.Users.Add(user);
+        await _context.SaveChangesAsync();
+
+        return Ok(new { message = "User added successfully", navigate = true });
+    }
+
+
 }

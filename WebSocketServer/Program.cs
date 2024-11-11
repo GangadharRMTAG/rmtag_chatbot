@@ -143,4 +143,6 @@ app.Map("/ws", async (HttpContext context) =>
     }
 });
 
+app.MapFallbackToFile("index.html");
+
 app.Run(url: "http://*:8080");
