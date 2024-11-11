@@ -12,8 +12,8 @@ using WebSocketServer.Data;
 namespace WebSocketServer.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20241109080744_AddIsActiveField")]
-    partial class AddIsActiveField
+    [Migration("20241111062843_InitialCreate")]
+    partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {

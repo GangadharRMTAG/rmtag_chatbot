@@ -50,7 +50,8 @@ namespace WebSocketServer.Migrations
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     Username = table.Column<string>(type: "text", nullable: true),
                     roomname = table.Column<string>(type: "text", nullable: true),
-                    ConnectionTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                    ConnectionTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    IsActive = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
                 {
