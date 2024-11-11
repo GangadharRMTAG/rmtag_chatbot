@@ -12,7 +12,7 @@ using WebSocketServer.Data;
 namespace WebSocketServer.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20241111080818_InitialCreate")]
+    [Migration("20241111114136_InitialCreate")]
     partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
