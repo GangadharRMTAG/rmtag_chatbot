@@ -14,6 +14,7 @@ using WebSocketServer.Data;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using WebSocketServer;
+using Microsoft.Extensions.FileProviders;
 
 
 
@@ -22,6 +23,11 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Logging.ClearProviders();
 builder.Logging.AddConsole();
 builder.Logging.SetMinimumLevel(LogLevel.Information);
+
+var environment = builder.Environment;
+var contentRoot = environment.ContentRootPath;
+builder.WebHost.UseContentRoot(contentRoot);
+
 
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddControllers();
@@ -88,6 +94,37 @@ builder.Services.AddDbContext<DataContext>(options =>
 
 var app = builder.Build();
 
+
+var wwwrootPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
+if (Directory.Exists(wwwrootPath))
+{
+    var loggerFactory = builder.Services.BuildServiceProvider().GetRequiredService<ILoggerFactory>();
+    var logger = loggerFactory.CreateLogger<Program>();
+
+    logger.LogInformation("The 'wwwroot' directory exists.");
+
+    var files = Directory.GetFiles(wwwrootPath);
+    if (files.Length > 0)
+    {
+        logger.LogInformation("Files in 'wwwroot':");
+        foreach (var file in files)
+        {
+            logger.LogInformation(file); // Log each file in wwwroot
+        }
+    }
+    else
+    {
+        logger.LogInformation("No files found in 'wwwroot'.");
+    }
+}
+else
+{
+    var loggerFactory = builder.Services.BuildServiceProvider().GetRequiredService<ILoggerFactory>();
+    var logger = loggerFactory.CreateLogger<Program>();
+    logger.LogError("The 'wwwroot' directory does not exist.");
+}
+
+
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
@@ -111,11 +148,15 @@ app.UseCors("AllowAll");
 // app.UseStaticFiles();
 app.UseStaticFiles(new StaticFileOptions
 {
-    OnPrepareResponse = ctx =>
-    {
-        Console.WriteLine($"Serving static file: {ctx.File.Name}");
-    }
+    // OnPrepareResponse = ctx =>
+    // {
+    //     Console.WriteLine($"Serving static file: {ctx.File.Name}");
+    // }
+    FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "wwwroot")),
+    RequestPath = "/wwwroot"
 });
+
+
 
 app.UseRouting();
 app.UseWebSockets();
