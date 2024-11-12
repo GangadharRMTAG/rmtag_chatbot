@@ -94,34 +94,34 @@ builder.Services.AddDbContext<DataContext>(options =>
 
 var app = builder.Build();
 
+// var directoryPath = Directory.GetCurrentDirectory(); 
+// var logger1 = app.Services.GetRequiredService<ILogger<Program>>();
 
-var wwwrootPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
-if (Directory.Exists(wwwrootPath))
+// logger1.LogInformation("Inspecting files in the directory: " + directoryPath);
+
+// var files = Directory.GetFiles(directoryPath);
+
+// foreach (var file in files)
+// {
+//     logger1.LogInformation("----File: " + file); 
+// }
+
+var directoryPath = Directory.GetCurrentDirectory(); 
+var logger1 = app.Services.GetRequiredService<ILogger<Program>>();
+
+logger1.LogInformation("Inspecting files and directories in the directory: " + directoryPath);
+
+// Log files
+var files = Directory.GetFiles(directoryPath);
+foreach (var file in files)
 {
-    var loggerFactory = builder.Services.BuildServiceProvider().GetRequiredService<ILoggerFactory>();
-    var logger = loggerFactory.CreateLogger<Program>();
-
-    logger.LogInformation("The 'wwwroot' directory exists.");
-
-    var files = Directory.GetFiles(wwwrootPath);
-    if (files.Length > 0)
-    {
-        logger.LogInformation("Files in 'wwwroot':");
-        foreach (var file in files)
-        {
-            logger.LogInformation(file); // Log each file in wwwroot
-        }
-    }
-    else
-    {
-        logger.LogInformation("No files found in 'wwwroot'.");
-    }
+    logger1.LogInformation("----File: " + file); 
 }
-else
+
+var directories = Directory.GetDirectories(directoryPath);
+foreach (var dir in directories)
 {
-    var loggerFactory = builder.Services.BuildServiceProvider().GetRequiredService<ILoggerFactory>();
-    var logger = loggerFactory.CreateLogger<Program>();
-    logger.LogError("The 'wwwroot' directory does not exist.");
+    logger1.LogInformation("----Directory: " + dir); 
 }
 
 
