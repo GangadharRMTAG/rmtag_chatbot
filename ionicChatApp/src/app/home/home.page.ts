@@ -20,8 +20,18 @@ export class HomePage implements OnInit {
 
   constructor(private route: Router, private http: HttpClient) { }
 
-  ngOnInit(): void 
-  {
+  // ngOnInit(): void 
+  // {
+  //   this.joinRoomForm = this.fb.group({
+  //     user: ['', Validators.required],
+  //     room: ['', Validators.required]
+  //   });
+  // }
+  ngOnInit(): void {
+    this.initializeForm();
+  }
+
+  initializeForm() {
     this.joinRoomForm = this.fb.group({
       user: ['', Validators.required],
       room: ['', Validators.required]
@@ -33,7 +43,7 @@ export class HomePage implements OnInit {
       const { user, room } = this.joinRoomForm.value;
       console.log('Joining room with', { user, room });
 
-     // this.http.post('http://192.168.1.9:8080/api/user/join', { Username: user, roomname: room })
+    //  this.http.post('http://192.168.1.9:8080/api/user/join', { Username: user, roomname: room })
       this.http.post('https://rmtagchatbot-production.up.railway.app/api/user/join', { Username: user, roomname: room })
         .subscribe(response => {
           console.log('User added:', response);
@@ -46,6 +56,14 @@ export class HomePage implements OnInit {
     } else {
       console.log('Form is not valid');
     }
+  }
+
+  resetForm() {
+    this.joinRoomForm.reset();
+  }
+
+  ionViewWillEnter() {
+    this.resetForm();
   }
   
 }

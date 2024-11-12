@@ -17,6 +17,7 @@ export class WebSocketService {
   constructor() {}
 
   connect(username: string, room: string): void {
+    this.clearMessages();
     this.connectCallCount++;
 
     if (this.socket && this.socket.readyState === WebSocket.OPEN) {
@@ -75,4 +76,9 @@ export class WebSocketService {
       this.socket.close();
     }
   }
+
+  clearMessages() {
+    this.messagesSubject.next([]); 
+  }
+  
 }

@@ -1,7 +1,8 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { WebSocketService } from '../services/websocket.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
+import { UserService } from '../services/user.service';
 
 @Component({
   selector: 'app-chat',
@@ -41,14 +42,20 @@ export class ChatComponent {
   }
 
   disconnect() {
+    console.log('disconnect () called...');
     this.webSocketService.disconnect();
   }
 
   leaveChat() {
     console.log('leave chat method');
+    this.disconnect();
+    this.webSocketService.clearMessages();
+    this.username='';
+    this.roomname='';
+    this.message='';
+    this.messages=[];
+    this.usersInRoom=[];
     this.router.navigate(['/home']);
   }
   
 }
-
-
