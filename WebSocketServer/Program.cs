@@ -169,19 +169,7 @@ using (var scope = app.Services.CreateScope())
 }
 
 app.UseCors("AllowAll");
-// app.UseStaticFiles();
-app.UseStaticFiles(new StaticFileOptions
-{
-    // OnPrepareResponse = ctx =>
-    // {
-    //     Console.WriteLine($"Serving static file: {ctx.File.Name}");
-    // }
-    FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "wwwroot")),
-    RequestPath = "/wwwroot"
-});
-
-
-
+app.UseStaticFiles();
 app.UseRouting();
 app.UseWebSockets();
 app.UseAuthorization();
