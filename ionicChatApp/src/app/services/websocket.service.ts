@@ -25,7 +25,7 @@ export class WebSocketService {
     }
     
     // this.socket = new WebSocket(`ws://192.168.1.9:8080/ws?username=${username}&roomname=${room}`);
-    this.socket = new WebSocket(`ws://rmtagchatbot-production.up.railway.app/ws?username=${username}&roomname=${room}`);
+    this.socket = new WebSocket(`wss://rmtagchatbot-production.up.railway.app/ws?username=${username}&roomname=${room}`);
 
 
     this.socket.onopen = () => {
