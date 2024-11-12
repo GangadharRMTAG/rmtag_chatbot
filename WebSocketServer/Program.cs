@@ -108,7 +108,15 @@ using (var scope = app.Services.CreateScope())
 }
 
 app.UseCors("AllowAll");
-app.UseStaticFiles();
+// app.UseStaticFiles();
+app.UseStaticFiles(new StaticFileOptions
+{
+    OnPrepareResponse = ctx =>
+    {
+        Console.WriteLine($"Serving static file: {ctx.File.Name}");
+    }
+});
+
 app.UseRouting();
 app.UseWebSockets();
 app.UseAuthorization();
@@ -145,4 +153,7 @@ app.Map("/ws", async (HttpContext context) =>
 
 app.MapFallbackToFile("index.html");
 
-app.Run(url: "http://*:8080");
+// app.Run(url: "http://*:8080");
+
+var port1 = Environment.GetEnvironmentVariable("PORT") ?? "8080";
+app.Run($"http://*:{port1}");
