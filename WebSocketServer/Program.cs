@@ -18,7 +18,19 @@ using Microsoft.Extensions.FileProviders;
 
 
 
-var builder = WebApplication.CreateBuilder(args);
+// var builder = WebApplication.CreateBuilder(args);
+var builder = WebApplication.CreateBuilder(new WebApplicationOptions()
+
+{
+
+Args = args,
+
+ContentRootPath = "/app/out",
+
+WebRootPath = "wwwroot",
+
+});
+
 
 builder.Logging.ClearProviders();
 builder.Logging.AddConsole();
@@ -94,35 +106,47 @@ builder.Services.AddDbContext<DataContext>(options =>
 
 var app = builder.Build();
 
-// var directoryPath = Directory.GetCurrentDirectory(); 
-// var logger1 = app.Services.GetRequiredService<ILogger<Program>>();
-
-// logger1.LogInformation("Inspecting files in the directory: " + directoryPath);
-
-// var files = Directory.GetFiles(directoryPath);
-
-// foreach (var file in files)
-// {
-//     logger1.LogInformation("----File: " + file); 
-// }
-
-var directoryPath = Directory.GetCurrentDirectory(); 
 var logger1 = app.Services.GetRequiredService<ILogger<Program>>();
-
-logger1.LogInformation("Inspecting files and directories in the directory: " + directoryPath);
-
-// Log files
-var files = Directory.GetFiles(directoryPath);
-foreach (var file in files)
+logger1.LogInformation("Current Content Root Path: " + Directory.GetCurrentDirectory());
+var outPath = Path.Combine(Directory.GetCurrentDirectory(), "out");
+if (Directory.Exists(outPath))
 {
-    logger1.LogInformation("----File: " + file); 
+    logger1.LogInformation("The 'out' directory exists.");
+
+    var files = Directory.GetFiles(outPath);
+    if (files.Length > 0)
+    {
+        logger1.LogInformation("Files in 'out':");
+        foreach (var file in files)
+        {
+            logger1.LogInformation("----File: " + file);  
+        }
+    }
+    else
+    {
+        logger1.LogInformation("No files found in 'out'.");
+    }
+
+    var subdirectories = Directory.GetDirectories(outPath);
+    if (subdirectories.Length > 0)
+    {
+        logger1.LogInformation("Subdirectories in 'out':");
+        foreach (var dir in subdirectories)
+        {
+            logger1.LogInformation("----Directory: " + dir); 
+        }
+    }
+    else
+    {
+        logger1.LogInformation("No subdirectories found in 'out'.");
+    }
+}
+else
+{
+    logger1.LogError("The 'out' directory does not exist.");
 }
 
-var directories = Directory.GetDirectories(directoryPath);
-foreach (var dir in directories)
-{
-    logger1.LogInformation("----Directory: " + dir); 
-}
+
 
 
 using (var scope = app.Services.CreateScope())
