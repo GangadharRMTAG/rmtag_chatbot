@@ -16,6 +16,8 @@ export class ChatComponent {
   message: string = '';
   messages: string[] = [];
   usersInRoom: string[] = [];
+  roomName: string = '';
+  rn:string='';
 
   constructor(private webSocketService: WebSocketService, private router: Router, private route: ActivatedRoute,
     private http: HttpClient
@@ -28,6 +30,9 @@ export class ChatComponent {
       console.log('Updated usersInRoom:', users);
       this.usersInRoom = users;
     });   
+    this.rn = this.webSocketService.roomname;
+    // console.log('--',this.rn);
+    this.fetchAllUsers(this.rn); 
   } 
 
   connect() {
@@ -57,5 +62,19 @@ export class ChatComponent {
     this.usersInRoom=[];
     this.router.navigate(['/home']);
   }
-  
+
+  //  private baseUrl = 'http://192.168.1.11:8080';
+   private baseUrl = 'https://rmtagchatbot-production.up.railway.app';
+  allUsersInRoom: string[] = [];
+  fetchAllUsers(roomName: string): void {
+    this.http.get<string[]>(`${this.baseUrl}/api/user/GetAllUsersInRoom/${this.rn}`).subscribe(
+      (users) => {
+        console.log('Fetched users:', users);
+        this.allUsersInRoom = users;
+      },
+      (error) => {
+        console.error('Failed to fetch all users in room', error);
+      }
+    );
+  }  
 }

@@ -44,7 +44,6 @@ public class WebSocketHandler
 
                 await SaveMessageToDatabase(user.Username, user.roomname, msg);
 
-                // await SendMessageToRoom(user.roomname, msg);
                 await SendMessageToRoom(user.roomname, message, user.Username);
 
 
@@ -176,8 +175,9 @@ public class WebSocketHandler
         if (_roomUsers.ContainsKey(roomName))
         {
             var connectedUsers = _roomUsers[roomName].Select(u => u.Username).ToList();
-            Console.WriteLine($"!!!!!Connected users in {roomName}: {string.Join(", ", connectedUsers)}");
-            var userListMessage = $"users:{string.Join(",", connectedUsers)}";
+            Console.WriteLine($"Connected users in {roomName}: {string.Join(", ", connectedUsers)}");
+            // var userListMessage = $"users:{string.Join(",", connectedUsers)}";
+            var userListMessage = $"Connected users in {roomName}: {string.Join(", ", connectedUsers)}";
             foreach (var user in _roomUsers[roomName])
             {
                 if (_sockets.TryGetValue(user.Username, out var socket) && socket.State == WebSocketState.Open)

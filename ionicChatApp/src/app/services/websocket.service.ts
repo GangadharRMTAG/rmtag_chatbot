@@ -1,3 +1,4 @@
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 
@@ -13,10 +14,12 @@ export class WebSocketService {
   public messages$ = this.messagesSubject.asObservable();
   
   private connectCallCount = 0;
+  public roomname!:string;
 
-  constructor() {}
+  constructor(private http:HttpClient) {}
 
   connect(username: string, room: string): void {
+    this.roomname=room;
     this.clearMessages();
     this.connectCallCount++;
 
@@ -25,7 +28,7 @@ export class WebSocketService {
       return;
     }
     
-    // this.socket = new WebSocket(`ws://192.168.1.9:8080/ws?username=${username}&roomname=${room}`);
+    // this.socket = new WebSocket(`ws://192.168.1.11:8080/ws?username=${username}&roomname=${room}`);
     this.socket = new WebSocket(`wss://rmtagchatbot-production.up.railway.app/ws?username=${username}&roomname=${room}`);
 
 
@@ -46,6 +49,7 @@ export class WebSocketService {
         console.log('Parsed chat message:', messages);
         this.messagesSubject.next(messages);
       }
+      this.handleIncomingMessage(message);
     };
     
 

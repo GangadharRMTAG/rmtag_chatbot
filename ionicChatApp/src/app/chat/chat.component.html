@@ -1,6 +1,6 @@
 <div class="container mt-5">
   <div class="chat_header">
-    <h3 class="text-center my-2">Welcome to <span class="text-warning">{{ roomname }}</span> Group</h3>
+    <h3 class="text-center my-2">Welcome to <span class="text-warning">{{ rn }}</span> Group</h3>
     <button (click)="leaveChat()" class="btn btn-danger">Leave Chat</button>
   </div>
 
@@ -12,20 +12,20 @@
             <h4 class="text-white">Connected Users</h4>
           </div>
         </div>
-
         <div class="inbox_chat">
-          <ng-container *ngFor="let user of usersInRoom">
+          <ng-container *ngFor="let user of allUsersInRoom">
             <div class="chat_list">
               <div class="chat_people">
-                <div class="chat_img"> <img src="https://ptetutorials.com/images/user-profile.png" alt="sunil"> </div>
+                <div class="chat_img">
+                  <img src="https://ptetutorials.com/images/user-profile.png" alt="{{ user }}">
+                </div>
                 <div class="chat_ib mt-3">
-                  <h5>{{user}} <span class="online"></span></h5>
+                  <h5>{{ user }} <span [class.online]="usersInRoom.includes(user)"></span></h5>
                 </div>
               </div>
             </div>
           </ng-container>
         </div>
-
       </div>
       <div class="mesgs">
         <div class="msg_history" #scrollMe [scrollTop]="scrollMe.scrollHeight">

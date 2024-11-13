@@ -43,7 +43,7 @@ export class HomePage implements OnInit {
       const { user, room } = this.joinRoomForm.value;
       console.log('Joining room with', { user, room });
 
-    //  this.http.post('http://192.168.1.9:8080/api/user/join', { Username: user, roomname: room })
+    //  this.http.post('http://192.168.1.11:8080/api/user/join', { Username: user, roomname: room })
       this.http.post('https://rmtagchatbot-production.up.railway.app/api/user/join', { Username: user, roomname: room })
         .subscribe(response => {
           console.log('User added:', response);
