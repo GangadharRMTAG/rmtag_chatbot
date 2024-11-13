@@ -83,5 +83,16 @@ public class UserController : ControllerBase
         return Ok(new { message = "User added successfully", navigate = true });
     }
 
+    [HttpGet("GetAllUsersInRoom/{roomName}")]
+    public IActionResult GetAllUsersInRoom(string roomName)
+    {
+        var usersInRoom = _context.Users
+            .Where(u => u.roomname == roomName)
+            .Select(u => u.Username)
+            .ToList();
+
+        return Ok(usersInRoom);
+    }
+
 
 }
