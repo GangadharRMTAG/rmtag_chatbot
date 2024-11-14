@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
+import { AppConfig } from '../app.config';
 
 @Injectable({
   providedIn: 'root',
@@ -16,6 +17,8 @@ export class WebSocketService {
   private connectCallCount = 0;
   public roomname!:string;
 
+  private baseUrl = AppConfig.baseUrl;
+
   constructor(private http:HttpClient) {}
 
   connect(username: string, room: string): void {
@@ -27,10 +30,8 @@ export class WebSocketService {
       console.log('WebSocket already connected.....');
       return;
     }
-    
-    // this.socket = new WebSocket(`ws://192.168.1.11:8080/ws?username=${username}&roomname=${room}`);
-    this.socket = new WebSocket(`wss://rmtagchatbot-production.up.railway.app/ws?username=${username}&roomname=${room}`);
 
+    this.socket = new WebSocket(`${this.baseUrl}/ws?username=${username}&roomname=${room}`);
 
     this.socket.onopen = () => {
       console.log('WebSocket connection established.....');

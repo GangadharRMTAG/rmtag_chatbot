@@ -42,7 +42,7 @@
 
         <div class="type_msg">
           <div class="input_msg_write">
-            <input [(ngModel)]="message" type="text" class="write_msg" placeholder="Type a message" />
+            <input [(ngModel)]="message" type="text" class="write_msg" placeholder="Type a message" (keyup.enter)="sendMessage()" />
             <button (click)="sendMessage()" class="msg_send_btn" type="button">Send</button>
           </div>
         </div>

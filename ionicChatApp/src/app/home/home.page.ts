@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { WebSocketService } from '../services/websocket.service'; 
+import { AppConfig } from '../app.config';
 
 interface JoinRoomResponse {
   message: string;
@@ -18,15 +19,10 @@ export class HomePage implements OnInit {
   fb = inject(FormBuilder);
   private websocketService: WebSocketService = inject(WebSocketService);
 
+  private baseUrl = AppConfig.baseUrl;
+
   constructor(private route: Router, private http: HttpClient) { }
 
-  // ngOnInit(): void 
-  // {
-  //   this.joinRoomForm = this.fb.group({
-  //     user: ['', Validators.required],
-  //     room: ['', Validators.required]
-  //   });
-  // }
   ngOnInit(): void {
     this.initializeForm();
   }
@@ -43,8 +39,7 @@ export class HomePage implements OnInit {
       const { user, room } = this.joinRoomForm.value;
       console.log('Joining room with', { user, room });
 
-    //  this.http.post('http://192.168.1.11:8080/api/user/join', { Username: user, roomname: room })
-      this.http.post('https://rmtagchatbot-production.up.railway.app/api/user/join', { Username: user, roomname: room })
+     this.http.post(`${this.baseUrl}/api/user/join`, {Username: user, roomname: room})
         .subscribe(response => {
           console.log('User added:', response);
           this.route.navigate(['/chat',{ roomname: room }]);

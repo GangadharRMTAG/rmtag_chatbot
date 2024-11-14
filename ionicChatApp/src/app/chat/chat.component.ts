@@ -3,6 +3,7 @@ import { WebSocketService } from '../services/websocket.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { UserService } from '../services/user.service';
+import { AppConfig } from '../app.config';
 
 @Component({
   selector: 'app-chat',
@@ -63,8 +64,8 @@ export class ChatComponent {
     this.router.navigate(['/home']);
   }
 
-  //  private baseUrl = 'http://192.168.1.11:8080';
-   private baseUrl = 'https://rmtagchatbot-production.up.railway.app';
+  private baseUrl = AppConfig.baseUrl;
+
   allUsersInRoom: string[] = [];
   fetchAllUsers(roomName: string): void {
     this.http.get<string[]>(`${this.baseUrl}/api/user/GetAllUsersInRoom/${this.rn}`).subscribe(
