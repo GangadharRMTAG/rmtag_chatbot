@@ -1,8 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { WebSocketService } from '../services/websocket.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
-import { UserService } from '../services/user.service';
 import { AppConfig } from '../app.config';
 
 @Component({
@@ -19,7 +18,7 @@ export class ChatComponent {
   usersInRoom: string[] = [];
   roomName: string = '';
   rn:string='';
-
+  
   constructor(private webSocketService: WebSocketService, private router: Router, private route: ActivatedRoute,
     private http: HttpClient
   ) {
@@ -68,6 +67,7 @@ export class ChatComponent {
 
   allUsersInRoom: string[] = [];
   fetchAllUsers(roomName: string): void {
+    console.log('fetch all users called .......');
     this.http.get<string[]>(`${this.baseUrl}/api/user/GetAllUsersInRoom/${this.rn}`).subscribe(
       (users) => {
         console.log('Fetched users:', users);
@@ -77,5 +77,30 @@ export class ChatComponent {
         console.error('Failed to fetch all users in room', error);
       }
     );
-  }  
+  }
+
+  doRefresh(event: any): void {
+    console.log('Begin doRefresh()...');
+        this.fetchAllUsers('this.rn'); 
+
+    setTimeout(() => {
+      console.log('end doRefresh()...');
+      event.target.complete(); 
+    }, 2000); 
+  }
+  
+  // using polling ---
+  // private pollingInterval : any;
+  // ngOnInit(): void {
+  //   this.pollingInterval = setInterval(() => {
+  //     this.fetchAllUsers(this.rn); 
+  //   }, 10000);
+  // }
+  
+  // ngOnDestroy(): void {
+  //   if (this.pollingInterval) {
+  //     clearInterval(this.pollingInterval);
+  //   }
+  // }
 }
+
