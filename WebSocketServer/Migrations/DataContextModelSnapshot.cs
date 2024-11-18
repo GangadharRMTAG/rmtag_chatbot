@@ -22,7 +22,7 @@ namespace WebSocketServer.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("WebSocketServer.Models.ChatMessage", b =>
+            modelBuilder.Entity("WebSocketServer.Models.Login", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -30,21 +30,28 @@ namespace WebSocketServer.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Message")
-                        .HasColumnType("text");
-
-                    b.Property<string>("Receiver")
-                        .HasColumnType("text");
-
-                    b.Property<string>("Sender")
-                        .HasColumnType("text");
-
-                    b.Property<DateTime>("Timestamp")
+                    b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Email")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<string>("FirstName")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<string>("LastName")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<string>("Password")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
 
                     b.HasKey("Id");
 
-                    b.ToTable("ChatMessages");
+                    b.ToTable("login");
                 });
 
             modelBuilder.Entity("WebSocketServer.Models.Message", b =>

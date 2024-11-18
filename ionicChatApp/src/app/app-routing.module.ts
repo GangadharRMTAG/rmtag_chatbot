@@ -2,6 +2,8 @@ import { Component, NgModule } from '@angular/core';
 import { PreloadAllModules, RouterModule, Routes } from '@angular/router';
 import { ChatComponent } from './chat/chat.component';
 import { WelcomeComponent } from './welcome/welcome.component';
+import { RegisterComponent } from './register/register.component';
+import { LoginComponent } from './login/login.component';
 
 const routes: Routes = [
   {
@@ -10,7 +12,7 @@ const routes: Routes = [
   },
   {
     path: '',
-    redirectTo: 'home',
+    redirectTo: 'login',
     pathMatch: 'full'
   },
   {
@@ -20,6 +22,14 @@ const routes: Routes = [
   {
     path: 'welcome',
     component:WelcomeComponent
+  },
+  {
+    path: 'register',
+    component : RegisterComponent
+  },
+  {
+    path :'login',
+    component : LoginComponent
   }
 ];
 
