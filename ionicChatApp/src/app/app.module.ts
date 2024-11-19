@@ -14,11 +14,12 @@ import { HttpClientModule } from '@angular/common/http';
 import { WelcomeComponent } from './welcome/welcome.component';
 import { RegisterComponent } from './register/register.component';
 import { LoginComponent } from './login/login.component';
+import { AuthService } from './services/auth.service';
 
 @NgModule({
   declarations: [AppComponent,ChatComponent,WelcomeComponent,RegisterComponent,LoginComponent],
   imports: [BrowserModule, IonicModule.forRoot(), AppRoutingModule,FormsModule,HttpClientModule, ReactiveFormsModule],
-  providers: [{ provide: RouteReuseStrategy, useClass: IonicRouteStrategy },WebSocketService],
+  providers: [{ provide: RouteReuseStrategy, useClass: IonicRouteStrategy },WebSocketService,AuthService],
   bootstrap: [AppComponent],
 })
 export class AppModule {}

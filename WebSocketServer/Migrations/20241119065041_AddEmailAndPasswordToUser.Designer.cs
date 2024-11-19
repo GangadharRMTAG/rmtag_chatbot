@@ -12,8 +12,8 @@ using WebSocketServer.Data;
 namespace WebSocketServer.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20241118101642_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20241119065041_AddEmailAndPasswordToUser")]
+    partial class AddEmailAndPasswordToUser
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -96,6 +96,12 @@ namespace WebSocketServer.Migrations
 
                     b.Property<DateTime>("ConnectionTime")
                         .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Email")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Password")
+                        .HasColumnType("text");
 
                     b.Property<string>("Username")
                         .HasColumnType("text");

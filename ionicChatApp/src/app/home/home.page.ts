@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { WebSocketService } from '../services/websocket.service'; 
 import { AppConfig } from '../app.config';
+import { AuthService } from '../services/auth.service';
 
 interface JoinRoomResponse {
   message: string;
@@ -15,50 +16,31 @@ interface JoinRoomResponse {
   styleUrls: ['./home.page.scss'],
 })
 export class HomePage implements OnInit {
-  joinRoomForm!: FormGroup;
-  fb = inject(FormBuilder);
-  private websocketService: WebSocketService = inject(WebSocketService);
+  username = '';
+  roomname = '';
+  email = '';
+  password = '';
 
-  private baseUrl = AppConfig.baseUrl;
+  constructor(private authService: AuthService, private router: Router) {}
 
-  constructor(private route: Router, private http: HttpClient) { }
+  ngOnInit(): void {}
 
-  ngOnInit(): void {
-    this.initializeForm();
-  }
-
-  initializeForm() {
-    this.joinRoomForm = this.fb.group({
-      user: ['', Validators.required],
-      room: ['', Validators.required]
-    });
-  }
-
-  joinRoom() {
-    if (this.joinRoomForm.valid) {
-      const { user, room } = this.joinRoomForm.value;
-      console.log('Joining room with', { user, room });
-
-     this.http.post(`${this.baseUrl}/api/user/join`, {Username: user, roomname: room})
-        .subscribe(response => {
-          console.log('User added:', response);
-          this.route.navigate(['/chat',{ roomname: room }]);
-          
-          this.websocketService.connect(user, room);
-        }, error => {
-          console.error('Error adding user:', error);
-        });
-    } else {
-      console.log('Form is not valid');
-    }
-  }
-
-  resetForm() {
-    this.joinRoomForm.reset();
-  }
-
-  ionViewWillEnter() {
-    this.resetForm();
-  }
+  onRegister() {
+    const user = {
+      username: this.username,
+      roomname: this.roomname,
+      email: this.email,
+      password: this.password
+    };
   
+    this.authService.register(user).subscribe(
+      (response) => {
+        alert(response.message);
+        this.router.navigate(['/login']);
+      },
+      (error) => {
+        alert(error.error.message);
+      }
+    );
+  }
 }

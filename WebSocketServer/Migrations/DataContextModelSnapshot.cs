@@ -95,6 +95,12 @@ namespace WebSocketServer.Migrations
                     b.Property<DateTime>("ConnectionTime")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<string>("Email")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Password")
+                        .HasColumnType("text");
+
                     b.Property<string>("Username")
                         .HasColumnType("text");
 

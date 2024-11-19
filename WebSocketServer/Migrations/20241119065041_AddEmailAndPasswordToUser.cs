@@ -6,7 +6,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace WebSocketServer.Migrations
 {
-    public partial class InitialCreate : Migration
+    public partial class AddEmailAndPasswordToUser : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -51,7 +51,9 @@ namespace WebSocketServer.Migrations
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     Username = table.Column<string>(type: "text", nullable: true),
                     roomname = table.Column<string>(type: "text", nullable: true),
-                    ConnectionTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                    ConnectionTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    Email = table.Column<string>(type: "text", nullable: true),
+                    Password = table.Column<string>(type: "text", nullable: true)
                 },
                 constraints: table =>
                 {

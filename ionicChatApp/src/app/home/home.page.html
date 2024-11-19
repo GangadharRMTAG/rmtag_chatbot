@@ -1,29 +1,32 @@
-<div class="container">
-  <div class="row">
-    <div class="col-md-6 offset-md-3">
-      <h2 class="text-center text-dark mt-5">Welcome to ChatHUB</h2>
-      <div class="text-center mb-5 text-dark">Please Join the Room to start Chatting</div>
-      <div class="card my-5">
+<div class="register-container">
+  <div class="card my-5 register-card">
+    <form (submit)="onRegister()" class="register-form">
+      <h2 class="form-title">Register</h2>
 
-        <form [formGroup]="joinRoomForm" class="card-body cardbody-color p-lg-5">
-          <div class="text-center">
-            <img src="assets/profile.png" class="img-fluid profile-image-pic img-thumbnail rounded-circle my-3"
-              width="200px" alt="profile">
-          </div>
-
-          <div class="mb-3">
-            <input formControlName="user" type="text" class="form-control" id="displayname" aria-describedby="emailHelp"
-              placeholder="Display Name">
-          </div>
-          <div class="mb-3">
-            <input formControlName="room" type="text" class="form-control" id="roomname" placeholder="Room Name">
-          </div>
-          <div class="text-center">
-            <button (click)="joinRoom()" type="submit" class="btn btn-color px-5 mb-5 w-100">Join</button>
-          </div>
-        </form>
+      <div class="form-group">
+        <label for="exampleDisplayName">User Name</label>
+        <input type="text" id="exampleDisplayName" class="form-control" name="username" [(ngModel)]="username" placeholder="User Name" required />
       </div>
 
-    </div>
+      <div class="form-group">
+        <label for="exampleRoomName">Room Name</label>
+        <input type="text" id="exampleRoomName" class="form-control" name="roomname" [(ngModel)]="roomname" placeholder="Room Name" required />
+      </div>
+
+      <div class="form-group">
+        <label for="exampleInputEmail1">Email Address</label>
+        <input type="email" id="exampleInputEmail1" class="form-control" name="email" [(ngModel)]="email" placeholder="Email" required />
+      </div>
+
+      <div class="form-group">
+        <label for="exampleInputPassword1">Password</label>
+        <input type="password" id="exampleInputPassword1" class="form-control" name="password" [(ngModel)]="password" placeholder="Password" required />
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary">Register</button>
+        <a routerLink="../login" class="btn btn-link">Cancel</a>
+      </div>
+    </form>
   </div>
 </div>

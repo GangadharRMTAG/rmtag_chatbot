@@ -5,18 +5,29 @@
 </ion-header>
 
 <ion-content>
-  <form (ngSubmit)="login()">
-    <ion-item>
-      <ion-label position="floating">Email</ion-label>
-      <ion-input type="email" [(ngModel)]="loginData.email" name="email"></ion-input>
-    </ion-item>
-
-    <ion-item>
-      <ion-label position="floating">Password</ion-label>
-      <ion-input type="password" [(ngModel)]="loginData.password" name="password"></ion-input>
-    </ion-item>
-
-    <ion-button expand="full" type="submit">Login</ion-button>
-    <a routerLink="../register" class="btn btn-link">Register</a>
-  </form>
+  <div class="login-container">
+    <form [formGroup]="loginForm" (ngSubmit)="onLogin()" class="login-form">
+      <h2 class="form-title">Login</h2>
+  
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input id="email" formControlName="email" type="email" class="form-control" />
+        <div *ngIf="loginForm.get('email')?.invalid && loginForm.get('email')?.touched" class="error-message">
+          <small *ngIf="loginForm.get('email')?.errors?.['required']">Email is required.</small>
+          <small *ngIf="loginForm.get('email')?.errors?.['email']">Invalid email format.</small>
+        </div>
+      </div>
+  
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input id="password" formControlName="password" type="password" class="form-control" />
+        <div *ngIf="loginForm.get('password')?.invalid && loginForm.get('password')?.touched" class="error-message">
+          <small>Password is required.</small>
+        </div>
+      </div>
+  
+      <button type="submit" [disabled]="loginForm.invalid" class="submit-button">Login</button>
+      <a routerLink="../home" class="btn btn-link">Register</a>
+    </form>
+  </div>
 </ion-content>

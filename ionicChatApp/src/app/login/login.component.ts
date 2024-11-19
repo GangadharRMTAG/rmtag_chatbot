@@ -1,7 +1,10 @@
 import { HttpClient } from '@angular/common/http';
-import { Component, OnInit } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { AppConfig } from '../app.config';
+import { AuthService } from '../services/auth.service';
+import { WebSocketService } from '../services/websocket.service';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 @Component({
   selector: 'app-login',
@@ -9,32 +12,56 @@ import { AppConfig } from '../app.config';
   styleUrls: ['./login.component.scss'],
 })
 export class LoginComponent implements OnInit {
-  private baseUrl = AppConfig.baseUrl;
+  loginForm!: FormGroup; 
+  fb = inject(FormBuilder); 
+  private webSocketService = inject(WebSocketService);
 
-  ngOnInit() {}
-  loginData = {
-    email: '',
-    password: '',
-  };
+  constructor(private authService: AuthService, private router: Router) {}
 
-  constructor(private http: HttpClient, private router: Router) {}
+  ngOnInit(): void {
+    this.initializeForm();
+  }
 
-  login() {
-    if (!this.loginData.email || !this.loginData.password) {
-      alert('Email and Password are required!');
-      return;
-    }
-
-     this.http.post(`${this.baseUrl}/api/login/login`, this.loginData).subscribe({
-      next: (res) => {
-        console.log('Login successful:', res);
-        alert('Login successful!');
-        this.router.navigate(['/home']);
-      },
-      error: (err) => {
-        console.error('Login failed:', err);
-        alert(err.error?.message || 'Invalid email or password.');
-      },
+  initializeForm() {
+    this.loginForm = this.fb.group({
+      email: ['', [Validators.required, Validators.email]],
+      password: ['', Validators.required],
     });
+  }
+
+  onLogin() {
+    if (this.loginForm.valid) {
+      const { email, password } = this.loginForm.value;
+      const credentials = { email, password };
+
+      this.authService.login(credentials).subscribe(
+        (response) => {
+          alert(response.message);
+
+          const username = response.username;
+          const roomname = response.roomname;
+
+          console.log('Establishing WebSocket connection:', { username, roomname });
+          this.webSocketService.connect(username, roomname);
+
+          this.router.navigate(['/chat'], {
+            queryParams: { username, roomname },
+          });
+        },
+        (error) => {
+          alert(error.error.message);
+        }
+      );
+    } else {
+      console.log('Form is not valid');
+    }
+  }
+
+  resetForm() {
+    this.loginForm.reset();
+  }
+
+  ionViewWillEnter() {
+    this.resetForm();
   }
 }

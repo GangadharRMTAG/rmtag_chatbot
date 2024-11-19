@@ -67,7 +67,7 @@ export class ChatComponent {
 
   allUsersInRoom: string[] = [];
   fetchAllUsers(roomName: string): void {
-    console.log('fetch all users called .......');
+    console.log('Fetching all users in room:', roomName);
     this.http.get<string[]>(`${this.baseUrl}/api/user/GetAllUsersInRoom/${this.rn}`).subscribe(
       (users) => {
         console.log('Fetched users:', users);
